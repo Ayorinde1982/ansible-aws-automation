@@ -1,0 +1,20 @@
+# Ansible
+*.retry
+.ansible/
+ansible.log
+
+# SSH keys (NEVER commit these!)
+*.pem
+*.key
+*_rsa
+*_rsa.pub
+id_rsa*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db

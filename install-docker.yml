@@ -1,0 +1,93 @@
+---
+- name: Install Docker and run Apache container
+  hosts: managed_nodes
+  become: yes
+  
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+        state: present
+        
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+        
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+        
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+        update_cache: yes
+        
+    - name: Install Docker Python module via apt
+      apt:
+        name: python3-docker
+        state: present
+        
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+        
+    - name: Add ubuntu user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+        
+    - name: Pull Apache Docker image
+      docker_image:
+        name: httpd
+        tag: latest
+        source: pull
+        
+    - name: Run Apache container
+      docker_container:
+        name: apache-web
+        image: httpd:latest
+        state: started
+        restart_policy: always
+        ports:
+          - "8080:80"
+        volumes:
+          - /tmp/apache-content:/usr/local/apache2/htdocs
+          
+    - name: Create custom HTML content
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head><title>Docker Apache</title></head>
+          <body>
+            <h1>Hello from Docker!</h1>
+            <p>This Apache server is running in a Docker container.</p>
+            <p>Managed by Ansible automation.</p>
+          </body>
+          </html>
+        dest: /tmp/apache-content/index.html
+        mode: '0644'
+        
+    - name: Verify Docker is running
+      command: docker ps
+      register: docker_ps
+      
+    - name: Display running containers
+      debug:
+        msg: "{{ docker_ps.stdout_lines }}"

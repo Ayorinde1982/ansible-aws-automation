@@ -1,0 +1,9 @@
+---
+# Variables for webserver role
+webserver_package: nginx
+webserver_port: 80
+webserver_document_root: /var/www/html
+webserver_index_file: index.html
+
+website_title: "Ansible Webserver Role"
+website_message: "This server was configured using Ansible roles"

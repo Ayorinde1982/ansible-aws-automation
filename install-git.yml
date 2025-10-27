@@ -1,0 +1,23 @@
+---
+- name: Install Git on managed nodes
+  hosts: managed_nodes
+  become: yes
+  
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+        
+    - name: Verify Git installation
+      command: git --version
+      register: git_version
+      
+    - name: Display Git version
+      debug:
+        msg: "Git version installed: {{ git_version.stdout }}"

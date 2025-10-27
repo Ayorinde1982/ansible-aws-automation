@@ -1,0 +1,7 @@
+---
+- name: Deploy webserver using role
+  hosts: managed_nodes
+  become: yes
+  
+  roles:
+    - webserver

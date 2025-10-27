@@ -1,0 +1,29 @@
+---
+# Tasks for webserver role
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install webserver package
+  apt:
+    name: "{{ webserver_package }}"
+    state: present
+
+- name: Start webserver service
+  service:
+    name: "{{ webserver_package }}"
+    state: started
+    enabled: yes
+
+- name: Deploy custom index page
+  template:
+    src: index.html.j2
+    dest: "{{ webserver_document_root }}/{{ webserver_index_file }}"
+    mode: '0644'
+  notify: restart webserver
+
+- name: Ensure webserver is running
+  service:
+    name: "{{ webserver_package }}"
+    state: started

@@ -1,0 +1,6 @@
+---
+# Handlers for webserver role
+- name: restart webserver
+  service:
+    name: "{{ webserver_package }}"
+    state: restarted
